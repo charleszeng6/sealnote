@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
@@ -95,12 +96,17 @@ public class BackupActivity extends Activity implements BackupUtils.BackupListen
      * @param file File object containing backup database
      */
     public void shareBackupFile(File file) {
-        Uri uri = Uri.fromFile(file);
-        Intent shareIntent = new Intent();
+        Uri uri;
+        uri = FileProvider.getUriForFile(
+                this,
+                this.getApplicationContext()
+                        .getPackageName() + ".provider", file);
 
+        Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.setType("application/octet-stream");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         startActivityForResult(Intent.createChooser(shareIntent, getString(R.string.send_to)),
                 REQUEST_BACKUP);
